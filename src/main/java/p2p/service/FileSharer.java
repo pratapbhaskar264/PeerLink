@@ -12,4 +12,11 @@ public class FileSharer {
         availableFiles = new HashMap<>(); // this will store files available at certain port as of now
     }
 
+    private int offerFile() {
+        int port;
+        while(true) {
+
+        }
+    }
+
 }
