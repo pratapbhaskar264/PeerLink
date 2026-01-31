@@ -9,7 +9,7 @@ public class FileSharer {
     private HashMap<Integer , String> availableFiles;
 
     public FileSharer(){
-        availableFiles = new HashMap<>();
+        availableFiles = new HashMap<>(); // this will store files available at certain port as of now
     }
 
 }
