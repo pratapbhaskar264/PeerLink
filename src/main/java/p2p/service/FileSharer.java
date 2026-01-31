@@ -1,6 +1,7 @@
 package p2p.service;
 
 import org.springframework.stereotype.Service;
+import p2p.utility.UploadUtils;
 
 import java.util.HashMap;
 
@@ -12,10 +13,13 @@ public class FileSharer {
         availableFiles = new HashMap<>(); // this will store files available at certain port as of now
     }
 
-    private int offerFile() {
+    private int offerFile(String filePath) {
         int port;
         while(true) {
-
+           port = UploadUtils.genrateCode();
+           if(!availableFiles.containsKey(port)) {
+               availableFiles.put(port,filePath);
+           }
         }
     }
 
