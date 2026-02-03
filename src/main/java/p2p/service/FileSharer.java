@@ -6,6 +6,7 @@ import p2p.utility.UploadUtils;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.HashMap;
@@ -45,7 +46,7 @@ public class FileSharer {
             System.out.println("Serving file " + new File(filePath).getName() +" on port : " + port);
             Socket clientSocket = serverSocket.accept(); // socket creation at the time of client request
             System.out.println("ClientConnection : " +clientSocket.getInetAddress() );
-            new Thread(new FileSenderHandler(clientSocket,filePath, , )).start();
+            new Thread(new FileSenderHandler(clientSocket,filePath)).start();
 
         } catch (IOException e) {
             System.out.println("Error in finding file on port : " +port);
@@ -55,20 +56,22 @@ public class FileSharer {
     
 
 private static class FileSenderHandler implements Runnable{
-
         private final Socket clientSocket;
         private final String filePath;
 
-
     public FileSenderHandler(Socket clientSocket, String filePath) {
-
         this.clientSocket = clientSocket;
         this.filePath = filePath;
     }
-
     @Override
     public void run() {
-        try(FileInputStream fis = new FileInputStream(filePath)){
+        try(FileInputStream fis = new FileInputStream(filePath)){ // we took input stream here from file and
+            OutputStream outputStream = clientSocket.getOutputStream();
+            String filename = new File(filePath).getName();
+            String header = "Filename "+filename+"\n";
+            outputStream.write(header.getBytes());
+
+
 
         } catch (Exception e) {
             e.printStackTrace();
