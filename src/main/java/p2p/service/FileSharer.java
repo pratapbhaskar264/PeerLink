@@ -29,13 +29,16 @@ public class FileSharer {
     }
 
     //downloading end
-    public void startFileSharer(int port) {
+    public void startFileSharer(int port) { //it seems that download handler will communicate to download...but filesharer is handling it all
         if(!availableFiles.containsKey(port)) {
             System.out.println("no such file associated with port " +port);
             return;
         }
         String filePath = availableFiles.get(port);
-        try(ServerSocket serverSocket = new ServerSocket(port) ) {
+        try(ServerSocket serverSocket = new ServerSocket(port) )  { //opening a socket here will automatically close it afterwards
+
+
+
 
         } catch (IOException e) {
             throw new RuntimeException(e);
