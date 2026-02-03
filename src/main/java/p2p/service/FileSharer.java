@@ -4,6 +4,7 @@ import org.springframework.stereotype.Service;
 import p2p.utility.UploadUtils;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -67,7 +68,11 @@ private static class FileSenderHandler implements Runnable{
 
     @Override
     public void run() {
-        
+        try(FileInputStream fis = new FileInputStream(filePath)){
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }
 }
