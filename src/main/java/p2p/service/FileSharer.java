@@ -29,8 +29,10 @@ public class FileSharer {
            }
         }
     }
-
+    // download end point will handle all the cumputations of header and all and then it will go to filesharer
     //downloading end
+    // client -> upload 
+    // client2 -> download -> server -> downloadEndPt. -> filesharer -> socket -> outcome  
     public void startFileSharer(int port) { //it seems that download handler will communicate to download...but filesharer is handling it all
         if(!availableFiles.containsKey(port)) {
             System.out.println("no such file associated with port " +port);
@@ -42,12 +44,23 @@ public class FileSharer {
             System.out.println("Serving file " + new File(filePath).getName() +" on port : " + port);
             Socket clientSocket = serverSocket.accept(); // socket creation at the time of client request
             System.out.println("ClientConnection : " +clientSocket.getInetAddress() );
-
+            new Thread(new FileSenderHandler(clientSocket,filePath)).start();
 
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            System.out.println("Error in finding file on port : " +port);
         }
 
     }
+    
 
+private static class FileSenderHandler implements Runnable{
+
+    public FileSenderHandler(Socket clientSocket, String filePath) {
+    }
+
+    @Override
+    public void run() {
+        
+    }
+}
 }
