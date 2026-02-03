@@ -22,7 +22,7 @@ public class FileSharer {
         while(true) {
            port = UploadUtils.genrateCode();
            if(!availableFiles.containsKey(port)) {
-               availableFiles.put(port,filePath);
+               availableFiles.put(port,filePath); // so basically map holds the file that appear to be at a port
                return port;
            }
         }
