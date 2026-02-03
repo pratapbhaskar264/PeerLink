@@ -37,7 +37,7 @@ public class FileSharer {
     // client2 -> download -> server -> downloadEndPt. -> filesharer -> socket -> outcome  
     public void startFileSharer(int port) { //it seems that download handler will communicate to download...but filesharer is handling it all
         if(!availableFiles.containsKey(port)) {
-            System.out.println("no such file associated with port " +port);
+            System.out.println("No file associated with port " +port);
             return;
         }
         String filePath = availableFiles.get(port);
@@ -49,7 +49,7 @@ public class FileSharer {
             new Thread(new FileSenderHandler(clientSocket,filePath)).start();
 
         } catch (IOException e) {
-            System.out.println("Error in finding file on port : " +port);
+            System.out.println("Error in finding file on port : " +port +" "+e.getMessage());
         }
 
     }
