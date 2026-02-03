@@ -3,8 +3,10 @@ package p2p.service;
 import org.springframework.stereotype.Service;
 import p2p.utility.UploadUtils;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.ServerSocket;
+import java.net.Socket;
 import java.util.HashMap;
 
 @Service
@@ -37,7 +39,9 @@ public class FileSharer {
         String filePath = availableFiles.get(port);
         try(ServerSocket serverSocket = new ServerSocket(port) )  { //opening a socket here will automatically close it afterwards
 
-
+            System.out.println("Serving file " + new File(filePath).getName() +" on port : " + port);
+            Socket clientSocket = serverSocket.accept(); // socket creation at the time of client request
+            System.out.println("ClientConnection : " +clientSocket.getInetAddress() );
 
 
         } catch (IOException e) {
