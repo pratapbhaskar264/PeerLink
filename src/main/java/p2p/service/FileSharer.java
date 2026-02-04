@@ -47,7 +47,6 @@ public class FileSharer {
             Socket clientSocket = serverSocket.accept(); // socket creation at the time of client request
             System.out.println("ClientConnection : " +clientSocket.getInetAddress() );
             new Thread(new FileSenderHandler(clientSocket,filePath)).start();
-
         } catch (IOException e) {
             System.out.println("Error in finding file on port : " +port +" "+e.getMessage());
         }
@@ -81,6 +80,12 @@ private static class FileSenderHandler implements Runnable{
             System.out.println("File " +filename+ " sent to " +clientSocket.getInetAddress());
         } catch (Exception e) {
             System.out.println("Error sending file to the client  " + e.getMessage() );
+        } finally {
+            try{
+                clientSocket.close();
+            }catch (Exception e) {
+                System.out.println("Error closing socket : " +e.getMessage());
+            }
         }
     }
 }
