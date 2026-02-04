@@ -52,7 +52,7 @@ public class FileSharer {
         }
 
     }
-    
+
 
 private static class FileSenderHandler implements Runnable{
         private final Socket clientSocket;
