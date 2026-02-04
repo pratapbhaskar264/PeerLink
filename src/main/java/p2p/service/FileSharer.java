@@ -35,7 +35,7 @@ public class FileSharer {
     //downloading end
     // client -> upload 
     // client2 -> download -> server -> downloadEndPt. -> filesharer -> socket -> outcome  
-    public void startFileSharer(int port) { //it seems that download handler will communicate to download...but filesharer is handling it all
+    public void startFileServer(int port) { //it seems that download handler will communicate to download...but filesharer is handling it all
         if(!availableFiles.containsKey(port)) {
             System.out.println("No file associated with port " +port);
             return;
