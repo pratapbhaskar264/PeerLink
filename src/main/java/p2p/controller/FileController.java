@@ -55,10 +55,10 @@ public class FileController {
         public void handle(HttpExchange httpExchange) throws IOException {
             Headers headers = httpExchange.getResponseHeaders();
             headers.add("Access-Control-Allow-Origin" , "*");
-            headers.add("Access-Control-Allow-Methods" , "GET , PORT , OPTIONS");
+            headers.add("Access-Control-Allow-Methods" , "GET , POST , OPTIONS");
             headers.add("Access-Control-Allow-Headers" , "Content-Type,Authorization");
 
-            if( httpExchange.getRequestMethod().equals("OPTIONS")) {
+            if( httpExchange.getRequestMethod().equalsIgnoreCase("OPTIONS")) {
                 httpExchange.sendResponseHeaders(204,-1);
             }
             String response = "NOT FOUND";
@@ -73,15 +73,27 @@ public class FileController {
     }
 
     //UPLOAD HANDLER
-    private class DownloadHandler implements HttpHandler {
+    private class UploadHandler implements HttpHandler {
 
         @Override
         public void handle (HttpExchange httpExchange) throws IOException {
 
             Headers headers = httpExchange.getResponseHeaders();
             headers.add("Access-Control-Allow-Origin" , "*");
-            headers.add("Access-Control-Allow-Methods" , "GET , PORT , OPTIONS");
-            headers.add("Access-Control-Allow-Headers" , "Content-Type,Authorization");
+//            headers.add("Access-Control-Allow-Methods" , "POST"); //Only post Allowed
+//            headers.add("Access-Control-Allow-Headers" , "Content-Type,Authorization");
+
+            if( httpExchange.getRequestMethod().equalsIgnoreCase("POST")) {
+                String response = "METHOD NOT ALLOWED";
+                httpExchange.sendResponseHeaders(405,response.getBytes().length);
+                try(OutputStream outputStream = httpExchange.getResponseBody()) { // auto close
+                    outputStream.write(response.getBytes());
+                }
+                return;
+            }
+             // if method is post
+
+
 
         }
 
