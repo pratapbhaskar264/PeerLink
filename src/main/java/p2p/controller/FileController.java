@@ -31,6 +31,11 @@ public class FileController {
             uploadDirFile.mkdir();
         }
 
+        httpServer.createContext("/upload" , new UploadHandler());
+        httpServer.createContext("/download" , new DownloadHandler());
+        httpServer.createContext("/" , new CORSHandler());
+        httpServer.setExecutor(excecutorService);
     }
+
 
 }
