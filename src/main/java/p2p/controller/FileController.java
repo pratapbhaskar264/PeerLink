@@ -91,7 +91,19 @@ public class FileController {
                 }
                 return;
             }
-             // if method is post
+             // if method is post ... fetch content type
+
+            Headers requestHeaders = httpExchange.getRequestHeaders();
+            String contentType = requestHeaders.getFirst("Content-Type");
+            if(contentType == null || !contentType.startsWith("multipart/form-data")) {
+                String response = "Bad request : Content-Type must be multipart/form-data";
+                httpExchange.sendResponseHeaders(400,response.getBytes().length);
+                try(OutputStream outputStream = httpExchange.getResponseBody()) {
+                    outputStream.write(response.getBytes());
+                }
+            }
+
+
 
 
 
