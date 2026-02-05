@@ -48,11 +48,11 @@ public class FileController {
         System.out.println("API server stopped");
     }
 
+    //CORS handler
     public class CORSHandler implements HttpHandler {
 
         @Override
         public void handle(HttpExchange httpExchange) throws IOException {
-
             Headers headers = httpExchange.getResponseHeaders();
             headers.add("Access-Control-Allow-Origin" , "*");
             headers.add("Access-Control-Allow-Methods" , "GET , PORT , OPTIONS");
@@ -61,7 +61,7 @@ public class FileController {
             if( httpExchange.getRequestMethod().equals("OPTIONS")) {
                 httpExchange.sendResponseHeaders(204,-1);
             }
-            String response = "NOT FOUND"
+            String response = "NOT FOUND";
 ;
             httpExchange.sendResponseHeaders(404,response.getBytes().length);
 
@@ -71,6 +71,22 @@ public class FileController {
         }
 
     }
+
+    //UPLOAD HANDLER
+    private class DownloadHandler implements HttpHandler {
+
+        @Override
+        public void handle (HttpExchange httpExchange) throws IOException {
+
+            Headers headers = httpExchange.getResponseHeaders();
+            headers.add("Access-Control-Allow-Origin" , "*");
+            headers.add("Access-Control-Allow-Methods" , "GET , PORT , OPTIONS");
+            headers.add("Access-Control-Allow-Headers" , "Content-Type,Authorization");
+
+        }
+
+    }
+
 
 
 
