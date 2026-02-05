@@ -1,7 +1,6 @@
 package p2p.controller;
 
 import com.sun.net.httpserver.HttpServer;
-import org.springframework.web.bind.annotation.RestController;
 import p2p.service.FileSharer;
 
 import java.io.File;
@@ -11,7 +10,6 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-@RestController
 public class FileController {
     private final FileSharer fileSharer;
     public final HttpServer httpServer;
@@ -36,6 +34,12 @@ public class FileController {
         httpServer.createContext("/" , new CORSHandler());
         httpServer.setExecutor(excecutorService);
     }
+    public void start() {
+        httpServer.start();
+        System.out.println("server started at port : " + httpServer.getAddress().getPort());
+    }
+
+
 
 
 }
