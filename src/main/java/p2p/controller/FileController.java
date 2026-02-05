@@ -15,7 +15,7 @@ import java.util.concurrent.Executors;
 public class FileController {
     private final FileSharer fileSharer;
     public final HttpServer httpServer;
-    //temp dir which will store files on temp basis
+    //temp dir which will store files on a temp basis
     private final String uploadDir;
     private final ExecutorService excecutorService;
 
@@ -24,7 +24,13 @@ public class FileController {
         this.httpServer = HttpServer.create(new InetSocketAddress(port) , 0);
 
         this.uploadDir = System.getProperty("java.io.tempdir") + File.separator + "peerlink-uploads";
-        this.excecutorService = Executors.newFixedThreadPool(10);
+        this.excecutorService = Executors.newFixedThreadPool(10); //10 threads allowed
+
+        File uploadDirFile = new File(uploadDir);
+        if(!uploadDirFile.exists()) {
+            uploadDirFile.mkdir();
+        }
+
     }
 
 }
