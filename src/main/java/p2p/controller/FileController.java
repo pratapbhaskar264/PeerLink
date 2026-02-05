@@ -103,6 +103,8 @@ public class FileController {
                 }
             }
 
+            // proceed if the method is post and content-Type is valid
+
 
 
 
