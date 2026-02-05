@@ -1,12 +1,15 @@
 package p2p.controller;
 
+import com.sun.net.httpserver.Headers;
+import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpServer;
+import org.springframework.http.server.reactive.HttpHandler;
 import p2p.service.FileSharer;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.net.InetSocketAddress;
-import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -43,6 +46,29 @@ public class FileController {
         httpServer.stop(0);
         excecutorService.shutdown();
         System.out.println("API server stopped");
+    }
+
+    public class CORSHandler implements HttpHandler {
+
+        @Override
+        public void handle(HttpExchange httpExchange) throws IOException {
+
+            Headers headers = httpExchange.getResponseHeaders();
+            headers.add("Access-Control-Allow-Origin" , "*");
+            headers.add("Access-Control-Allow-Methods" , "GET , PORT , OPTIONS");
+            headers.add("Access-Control-Allow-Headers" , "Content-Type,Authorization");
+
+            if( httpExchange.getRequestMethod().equals("OPTIONS")) {
+                httpExchange.sendResponseHeaders(204,-1);
+            }
+            String response = "NOT FOUND"
+;
+            httpExchange.sendResponseHeaders(404,response.getBytes().length);
+
+            try(OutputStream outputStream = httpExchange.getResponseBody()) { // auto close
+                outputStream.write(response.getBytes());
+            }
+        }
 
     }
 
