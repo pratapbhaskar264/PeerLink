@@ -39,6 +39,13 @@ public class FileController {
         System.out.println("server started at port : " + httpServer.getAddress().getPort());
     }
 
+    public void stop() {
+        httpServer.stop(0);
+        excecutorService.shutdown();
+        System.out.println("API server stopped");
+
+    }
+
 
 
 
