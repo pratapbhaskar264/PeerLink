@@ -141,6 +141,22 @@ public class FileController {
                 if(filenameStart==-1){
                     return null; // no filename found;
                 }
+
+                int filenameEnd = dataAsString.indexOf("\"" , filenameStart);
+                String filename = dataAsString.substring(filenameStart , filenameEnd);
+
+                String contentTypeMarker = "Content-Type: ";
+                int contentTypeStart = dataAsString.indexOf(contentTypeMarker,filenameEnd);
+                String contentType = "application/octet-stream";
+                if(contentTypeStart !=-1) {
+                    contentTypeStart += contentTypeMarker.length();
+                    int contentTypeEnd = dataAsString.indexOf("\r\n" , contentTypeStart);
+
+                }
+
+
+            } catch (Exception e) {
+                e.printStackTrace();
             }
         }
 
