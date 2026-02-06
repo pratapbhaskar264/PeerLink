@@ -160,6 +160,10 @@ public class FileController {
                 if(headerEnd == -1) { // no empty space found after content type
                     return null;
                 }
+                int contentStart = headerEnd + headerEndMarker.length();
+
+                byte[] boundaryBytes = ("\r\n--"+boundary+"--").getBytes();
+                int contentEnd = findSequence(data,boundaryBytes);
 
 
             } catch (Exception e) {
