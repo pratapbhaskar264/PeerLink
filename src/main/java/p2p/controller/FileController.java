@@ -134,7 +134,14 @@ public class FileController {
         }
 
         public ParseResult parse() {
-
+            try{
+                String dataAsString = new String(data); // pdf json csv txt
+                String filenameMarker = "filename=\"";
+                int filenameStart = dataAsString.indexOf(filenameMarker);
+                if(filenameStart==-1){
+                    return null; // no filename found;
+                }
+            }
         }
 
     }
