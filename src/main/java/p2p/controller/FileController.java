@@ -132,6 +132,21 @@ public class FileController {
             this.data = data;
             this.boundary = boundary;
         }
+
+        public ParseResult parse() {
+
+        }
+
+    }
+
+    public static class ParseResult{
+        private final String fileName;
+        private final byte[] fileContent;
+
+        public ParseResult(String fileName, byte[] fileContent) {
+            this.fileName = fileName;
+            this.fileContent = fileContent;
+        }
     }
 
 
