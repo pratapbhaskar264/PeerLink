@@ -115,16 +115,23 @@ public class FileController {
                 IOUtils.copy(httpExchange.getRequestBody() , byteArrayOutputStream);
                 byte[] requestdata = byteArrayOutputStream.toByteArray();
 
+                MultiParser multiParser = new MultiParser(requestdata , boundary);
 
             } catch (Exception e) {
                 e.printStackTrace();
             }
-
-
-
-
         }
+    }
+    private static class Multiparser{
 
+        public final byte[] data;
+        public final String boundary;
+
+
+        private Multiparser(byte[] data, String boundary) {
+            this.data = data;
+            this.boundary = boundary;
+        }
     }
 
 
