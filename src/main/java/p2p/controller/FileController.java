@@ -3,9 +3,11 @@ package p2p.controller;
 import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpServer;
+import org.apache.tomcat.util.http.fileupload.IOUtils;
 import org.springframework.http.server.reactive.HttpHandler;
 import p2p.service.FileSharer;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -105,6 +107,18 @@ public class FileController {
 
             // proceed if the method is post and content-Type is valid
 
+            try {
+
+                String boundary = contentType.substring(contentType.indexOf("boundary=")+9);
+                ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+
+                IOUtils.copy(httpExchange.getRequestBody() , byteArrayOutputStream);
+                byte[] requestdata = byteArrayOutputStream.toByteArray();
+
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
 
 
 
