@@ -151,7 +151,14 @@ public class FileController {
                 if(contentTypeStart !=-1) {
                     contentTypeStart += contentTypeMarker.length();
                     int contentTypeEnd = dataAsString.indexOf("\r\n" , contentTypeStart);
+                    contentType = dataAsString.substring(contentTypeStart,contentTypeEnd);
+                }
 
+                //data retrieval
+                String headerEndMarker = "\r\n\r\n";
+                int headerEnd = dataAsString.indexOf(headerEndMarker);
+                if(headerEnd == -1) { // no empty space found after content type
+                    return null;
                 }
 
 
