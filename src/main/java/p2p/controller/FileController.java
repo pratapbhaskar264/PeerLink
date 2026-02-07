@@ -173,14 +173,14 @@ public class FileController {
                 }
 
                 // finally getting raw data from file after file name content start and content End are successfully found out
+                byte[] fileContent = new byte[contentEnd-contentStart];
+                System.arraycopy(data,contentStart,fileContent,0,fileContent.length);
+                return new ParseResult(filename,fileContent);
 
             } catch (Exception e) {
                 e.printStackTrace();
             }
-//            return null;
         }
-
-
     }
 
     public static class ParseResult{
