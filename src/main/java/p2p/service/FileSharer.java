@@ -20,7 +20,7 @@ public class FileSharer {
     }
 
     // uploading end
-    private int offerFile(String filePath) { // it is taking file path and returning port ->
+    public int offerFile(String filePath) { // it is taking file path and returning port ->
         // -> after its loaded with file in available file map
         int port;
         while(true) {

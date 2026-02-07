@@ -7,11 +7,9 @@ import org.apache.tomcat.util.http.fileupload.IOUtils;
 import org.springframework.http.server.reactive.HttpHandler;
 import p2p.service.FileSharer;
 
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.IOException;
-import java.io.OutputStream;
+import java.io.*;
 import java.net.InetSocketAddress;
+import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -125,6 +123,22 @@ public class FileController {
                     }
                     return;
                 }
+
+                String fileName = result.fileName;
+                if(fileName == null || fileName.trim().isEmpty()) {
+                    fileName = "unnamed-File";
+                }
+                String uniqueFilename = UUID.randomUUID().toString() +"_" + new File(fileName).getName();
+                String filePath = uploadDir + File.separator + uniqueFilename;
+
+                try(FileOutputStream fileOutputStream = new FileOutputStream(filePath) ) {
+                    fileOutputStream.write(result.fileContent);
+                }
+                //uploading to a port
+                int port = fileSharer.offerFile(filePath);
+                new Thread(() -> fileSharer.startFileServer(port)).start();
+
+
 
 
             } catch (Exception e) {
