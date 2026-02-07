@@ -137,12 +137,21 @@ public class FileController {
                 //uploading to a port
                 int port = fileSharer.offerFile(filePath);
                 new Thread(() -> fileSharer.startFileServer(port)).start();
+                String jsonResponse = "{\"port\":}" + port + "}";
+                headers.add("Content-Type","application/json");
+                httpExchange.sendResponseHeaders(200,jsonResponse.getBytes().length);
 
-
-
-
+                try(OutputStream outputStream = httpExchange.getResponseBody()) {
+                    outputStream.write(jsonResponse.getBytes());
+                }
             } catch (Exception e) {
-
+                    System.err.println("Error processing fileUpload" + e.getMessage());
+                    String response = "Sever Error : " + e.getMessage();
+                    httpExchange.sendResponseHeaders(500,response.getBytes().length);
+                    try(OutputStream outputStream = httpExchange.getResponseBody()) {
+                        outputStream.write(response.getBytes());
+                    }
+                    return;
             }
         }
     }
