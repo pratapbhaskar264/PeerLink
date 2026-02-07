@@ -164,6 +164,13 @@ public class FileController {
 
                 byte[] boundaryBytes = ("\r\n--"+boundary+"--").getBytes();
                 int contentEnd = findSequence(data,boundaryBytes,contentStart); // found the end point of data in file
+                if(contentEnd == -1 ) {
+                    boundaryBytes = ("\r\n--"+boundary).getBytes();
+                    contentEnd = findSequence(data,boundaryBytes,contentStart); // end format changed .. without "--"
+                }
+                if(contentEnd==-1 || contentEnd <= contentStart) {
+                    return null;
+                }
 
 
 
