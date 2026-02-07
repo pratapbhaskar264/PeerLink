@@ -170,6 +170,18 @@ public class FileController {
                 e.printStackTrace();
             }
         }
+        private int findSequence(byte[] data , byte[] seqeunce , int startPos) {
+            outer :
+            for(int i= startPos ;i <= data.length - seqeunce.length;i++) {
+                for(int j=0;j<seqeunce.length;j++) {
+                    if(data[i+j] != seqeunce[j]) {
+                        continue outer;
+                    }
+                }
+                return i;
+            }
+            return -1;
+        }
 
     }
 
