@@ -163,25 +163,16 @@ public class FileController {
                 int contentStart = headerEnd + headerEndMarker.length();
 
                 byte[] boundaryBytes = ("\r\n--"+boundary+"--").getBytes();
-                int contentEnd = findSequence(data,boundaryBytes);
+                int contentEnd = findSequence(data,boundaryBytes,contentStart); // found the end point of data in file
+
 
 
             } catch (Exception e) {
                 e.printStackTrace();
             }
+//            return null;
         }
-        private int findSequence(byte[] data , byte[] seqeunce , int startPos) {
-            outer :
-            for(int i= startPos ;i <= data.length - seqeunce.length;i++) {
-                for(int j=0;j<seqeunce.length;j++) {
-                    if(data[i+j] != seqeunce[j]) {
-                        continue outer;
-                    }
-                }
-                return i;
-            }
-            return -1;
-        }
+
 
     }
 
@@ -197,6 +188,17 @@ public class FileController {
 
 
 
-
+    private static int findSequence(byte[] data , byte[] seqeunce , int startPos) {
+        outer :
+        for(int i= startPos ;i <= data.length - seqeunce.length;i++) {
+            for(int j=0;j<seqeunce.length;j++) {
+                if(data[i+j] != seqeunce[j]) {
+                    continue outer;
+                }
+            }
+            return i;
+        }
+        return -1;
+    }
 
 }
