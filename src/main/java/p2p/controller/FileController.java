@@ -115,14 +115,24 @@ public class FileController {
                 IOUtils.copy(httpExchange.getRequestBody() , byteArrayOutputStream);
                 byte[] requestdata = byteArrayOutputStream.toByteArray();
 
-                MultiParser multiParser = new MultiParser(requestdata , boundary);
+                Multiparser multiParser = new Multiparser(requestdata , boundary);
+                Multiparser.ParseResult result = multiParser.parse();
+                if(result == null) {
+                    String response = "Bad request : Could not parse File Content ";
+                    httpExchange.sendResponseHeaders(400,response.getBytes().length);
+                    try(OutputStream outputStream = httpExchange.getResponseBody() ) {
+                        outputStream.write(response.getBytes());
+                    }
+                    return;
+                }
+
 
             } catch (Exception e) {
-                e.printStackTrace();
+
             }
         }
     }
-    private static class Multiparser{
+    private static class Multiparser {
 
         public final byte[] data;
         public final String boundary;
@@ -134,78 +144,80 @@ public class FileController {
         }
 
         public ParseResult parse() {
-            try{
+            try {
                 String dataAsString = new String(data); // pdf json csv txt
                 String filenameMarker = "filename=\"";
                 int filenameStart = dataAsString.indexOf(filenameMarker);
-                if(filenameStart==-1){
+                if (filenameStart == -1) {
                     return null; // no filename found;
                 }
 
-                int filenameEnd = dataAsString.indexOf("\"" , filenameStart);
-                String filename = dataAsString.substring(filenameStart , filenameEnd);
+                int filenameEnd = dataAsString.indexOf("\"", filenameStart);
+                String filename = dataAsString.substring(filenameStart, filenameEnd);
 
                 String contentTypeMarker = "Content-Type: ";
-                int contentTypeStart = dataAsString.indexOf(contentTypeMarker,filenameEnd);
+                int contentTypeStart = dataAsString.indexOf(contentTypeMarker, filenameEnd);
                 String contentType = "application/octet-stream";
-                if(contentTypeStart !=-1) {
+                if (contentTypeStart != -1) {
                     contentTypeStart += contentTypeMarker.length();
-                    int contentTypeEnd = dataAsString.indexOf("\r\n" , contentTypeStart);
-                    contentType = dataAsString.substring(contentTypeStart,contentTypeEnd);
+                    int contentTypeEnd = dataAsString.indexOf("\r\n", contentTypeStart);
+                    contentType = dataAsString.substring(contentTypeStart, contentTypeEnd);
                 }
 
                 //data retrieval
                 String headerEndMarker = "\r\n\r\n";
                 int headerEnd = dataAsString.indexOf(headerEndMarker);
-                if(headerEnd == -1) { // no empty space found after content type
+                if (headerEnd == -1) { // no empty space found after content type
                     return null;
                 }
                 int contentStart = headerEnd + headerEndMarker.length();
 
-                byte[] boundaryBytes = ("\r\n--"+boundary+"--").getBytes();
-                int contentEnd = findSequence(data,boundaryBytes,contentStart); // found the end point of data in file
-                if(contentEnd == -1 ) {
-                    boundaryBytes = ("\r\n--"+boundary).getBytes();
-                    contentEnd = findSequence(data,boundaryBytes,contentStart); // end format changed .. without "--"
+                byte[] boundaryBytes = ("\r\n--" + boundary + "--").getBytes();
+                int contentEnd = findSequence(data, boundaryBytes, contentStart); // found the end point of data in file
+                if (contentEnd == -1) {
+                    boundaryBytes = ("\r\n--" + boundary).getBytes();
+                    contentEnd = findSequence(data, boundaryBytes, contentStart); // end format changed .. without "--"
                 }
-                if(contentEnd==-1 || contentEnd <= contentStart) {
+                if (contentEnd == -1 || contentEnd <= contentStart) {
                     return null;
                 }
 
                 // finally getting raw data from file after file name content start and content End are successfully found out
-                byte[] fileContent = new byte[contentEnd-contentStart];
-                System.arraycopy(data,contentStart,fileContent,0,fileContent.length);
-                return new ParseResult(filename,fileContent);
+                byte[] fileContent = new byte[contentEnd - contentStart];
+                System.arraycopy(data, contentStart, fileContent, 0, fileContent.length);
+                return new ParseResult(filename, fileContent, contentType);
 
             } catch (Exception e) {
-                e.printStackTrace();
+                System.out.println("Error fetching multiPartData : " + e.getMessage());
+                return null;
             }
         }
-    }
 
-    public static class ParseResult{
-        private final String fileName;
-        private final byte[] fileContent;
 
-        public ParseResult(String fileName, byte[] fileContent) {
-            this.fileName = fileName;
-            this.fileContent = fileContent;
+        public static class ParseResult {
+            private final String fileName;
+            private final byte[] fileContent;
+            private final String content;
+
+            public ParseResult(String fileName, byte[] fileContent, String content) {
+                this.fileName = fileName;
+                this.fileContent = fileContent;
+                this.content = content;
+            }
         }
-    }
 
 
-
-    private static int findSequence(byte[] data , byte[] seqeunce , int startPos) {
-        outer :
-        for(int i= startPos ;i <= data.length - seqeunce.length;i++) {
-            for(int j=0;j<seqeunce.length;j++) {
-                if(data[i+j] != seqeunce[j]) {
-                    continue outer;
+        private static int findSequence(byte[] data, byte[] seqeunce, int startPos) {
+            outer:
+            for (int i = startPos; i <= data.length - seqeunce.length; i++) {
+                for (int j = 0; j < seqeunce.length; j++) {
+                    if (data[i + j] != seqeunce[j]) {
+                        continue outer;
+                    }
                 }
+                return i;
             }
-            return i;
+            return -1;
         }
-        return -1;
     }
-
 }
