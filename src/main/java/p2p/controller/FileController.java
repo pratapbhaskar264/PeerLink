@@ -185,7 +185,7 @@ public class FileController {
                     File tempFile = File.createTempFile("download-" , ".tmp");
                     String fileName = "download-file";
                     try(FileOutputStream fileOutputStream = new FileOutputStream(tempFile)){
-                        byte[] buffer = new byte[4096]; // size of file considered;
+                        byte[] buffer = new byte[4096]; // size of file considered 4096 bytes 4KB
                         int byteRead;
                         ByteArrayOutputStream headerBaos = new ByteArrayOutputStream();
                         int b;
@@ -193,7 +193,21 @@ public class FileController {
                             if(b=='\n') break;
                             headerBaos.write(b);
                         }
-                        String
+                        //filename extraction
+                        String header = headerBaos.toString().trim();
+                        if(header.startsWith("Filename: ")){
+                            fileName = header.substring("Filename: ".length()); // "Filename: hello.txt" so now it will have hello.txt
+                        }
+                        // read file content only 4KB ..... handle it for more size
+                        while((byteRead = socketInput.read(buffer)) != -1){
+                            fileOutputStream.write(buffer,0,byteRead);
+                        }
+
+                        headers.add("Content-Disposition: " , "attachment; filename=\"" + fileName+"\"");
+                        headers.add("Content-Type" , "application/octet-stream");
+
+
+
                     }
                 } catch (Exception e) {
 
