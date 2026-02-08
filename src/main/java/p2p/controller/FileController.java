@@ -155,6 +155,11 @@ public class FileController {
             }
         }
     }
+    private class DownloadHandler implements HttpHandler{
+
+        @Override
+
+    }
     private static class Multiparser {
 
         public final byte[] data;
