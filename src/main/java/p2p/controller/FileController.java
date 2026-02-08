@@ -177,48 +177,55 @@ public class FileController {
             // -> the client via sockets (this is how we are handling multiple requests from multiple users)
             String path = httpExchange.getRequestURI().getPath();
             String portStr = path.substring(path.lastIndexOf("/")+1); // this may give error
-            try{
+            try {
                 int port = Integer.parseInt(portStr);
                 //creation of socket now from
-                try(Socket socket = new Socket("localhost",port)){
+                try (Socket socket = new Socket("localhost", port)) {
                     InputStream socketInput = socket.getInputStream();
-                    File tempFile = File.createTempFile("download-" , ".tmp");
+                    File tempFile = File.createTempFile("download-", ".tmp");
                     String fileName = "download-file";
-                    try(FileOutputStream fileOutputStream = new FileOutputStream(tempFile)){
+                    try (FileOutputStream fileOutputStream = new FileOutputStream(tempFile)) {
                         byte[] buffer = new byte[4096]; // size of file considered 4096 bytes 4KB
                         int byteRead;
                         ByteArrayOutputStream headerBaos = new ByteArrayOutputStream();
                         int b;
-                        while( (b = socketInput.read() )!=-1) {
-                            if(b=='\n') break;
+                        while ((b = socketInput.read()) != -1) {
+                            if (b == '\n') break;
                             headerBaos.write(b);
                         }
                         //filename extraction
                         String header = headerBaos.toString().trim();
-                        if(header.startsWith("Filename: ")){
+                        if (header.startsWith("Filename: ")) {
                             fileName = header.substring("Filename: ".length()); // "Filename: hello.txt" so now it will have hello.txt
                         }
                         // read file content only 4KB ..... handle it for more size
-                        while((byteRead = socketInput.read(buffer)) != -1){
-                            fileOutputStream.write(buffer,0,byteRead);
+                        while ((byteRead = socketInput.read(buffer)) != -1) {
+                            fileOutputStream.write(buffer, 0, byteRead);
                         }
-
-                        headers.add("Content-Disposition: " , "attachment; filename=\"" + fileName+"\"");
-                        headers.add("Content-Type" , "application/octet-stream");
-                        httpExchange.sendResponseHeaders(200,tempFile.length());
-                        try(OutputStream outputStream = httpExchange.getResponseBody()) {
-                            FileInputStream fileInputStream = new FileInputStream(tempFile); // sending this temp file to client
-                        }
-
-
-
                     }
+                    headers.add("Content-Disposition: ", "attachment; filename=\"" + fileName + "\"");
+                    headers.add("Content-Type", "application/octet-stream");
+                    httpExchange.sendResponseHeaders(200, tempFile.length());
+                    // sending this temp file to the client
+                    try (OutputStream outputStream = httpExchange.getResponseBody()) {
+                        FileInputStream fileInputStream = new FileInputStream(tempFile); // sending this temp file to a client
+                        byte[] buffer = new byte[4096];
+                        int bytesRead;
+                        while ((bytesRead = fileInputStream.read(buffer)) != -1) {
+                            outputStream.write(buffer, 0, bytesRead);
+                        }
+                    }
+                    tempFile.delete();
                 } catch (Exception e) {
-
+                    System.out.println("Not able to download file" + e.getMessage());
+                    String response = "Error downloading file" + e.getMessage();
+                    headers.add("Content-Type" , "text/plain");
+                    httpExchange.sendResponseHeaders(404,response.getBytes().length);
+                    try(OutputStream outputStream = httpExchange.getResponseBody()) {
+                        outputStream.write(response.getBytes());
+                    }
                 }
             }
-
-
         }
 
 
