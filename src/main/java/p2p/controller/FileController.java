@@ -181,7 +181,20 @@ public class FileController {
                 int port = Integer.parseInt(portStr);
                 //creation of socket now from
                 try(Socket socket = new Socket("localhost",port)){
-                    if()
+                    InputStream socketInput = socket.getInputStream();
+                    File tempFile = File.createTempFile("download-" , ".tmp");
+                    String fileName = "download-file";
+                    try(FileOutputStream fileOutputStream = new FileOutputStream(tempFile)){
+                        byte[] buffer = new byte[4096]; // size of file considered;
+                        int byteRead;
+                        ByteArrayOutputStream headerBaos = new ByteArrayOutputStream();
+                        int b;
+                        while( (b = socketInput.read() )!=-1) {
+                            if(b=='\n') break;
+                            headerBaos.write(b);
+                        }
+                        String
+                    }
                 } catch (Exception e) {
 
                 }
