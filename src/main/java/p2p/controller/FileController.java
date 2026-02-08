@@ -9,6 +9,7 @@ import p2p.service.FileSharer;
 
 import java.io.*;
 import java.net.InetSocketAddress;
+import java.net.Socket;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -162,14 +163,31 @@ public class FileController {
             Headers headers = httpExchange.getResponseHeaders();
             headers.add("Access-Control-Allow-Origin","*");
 
+            //method is not "GET"
             if(!httpExchange.getRequestMethod().equalsIgnoreCase("GET")) {
                 String response = "Method Not Allowed";
                 httpExchange.sendResponseHeaders(405,response.getBytes().length);
                 try(OutputStream outputStream = httpExchange.getResponseBody()) {
                     outputStream.write(response.getBytes());
                 }
-
+           return;
             }
+
+            // now access port frm URL and create a socket from server to fileSharer that will eventually help us to send the data to ->
+            // -> the client via sockets (this is how we are handling multiple requests from multiple users)
+            String path = httpExchange.getRequestURI().getPath();
+            String portStr = path.substring(path.lastIndexOf("/")+1); // this may give error
+            try{
+                int port = Integer.parseInt(portStr);
+                //creation of socket now from
+                try(Socket socket = new Socket("localhost",port)){
+                    if()
+                } catch (Exception e) {
+
+                }
+            }
+
+
         }
 
 
