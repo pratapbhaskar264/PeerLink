@@ -155,9 +155,23 @@ public class FileController {
             }
         }
     }
-    private class DownloadHandler implements HttpHandler{
+    private class DownloadHandler implements HttpHandler {
 
         @Override
+        public void handle(HttpExchange httpExchange) throws IOException {
+            Headers headers = httpExchange.getResponseHeaders();
+            headers.add("Access-Control-Allow-Origin","*");
+
+            if(!httpExchange.getRequestMethod().equalsIgnoreCase("GET")) {
+                String response = "Method Not Allowed";
+                httpExchange.sendResponseHeaders(405,response.getBytes().length);
+                try(OutputStream outputStream = httpExchange.getResponseBody()) {
+                    outputStream.write(response.getBytes());
+                }
+
+            }
+        }
+
 
     }
     private static class Multiparser {
