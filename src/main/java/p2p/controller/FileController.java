@@ -253,59 +253,95 @@ public class FileController {
             this.boundary = boundary;
         }
 
-        public ParseResult parse() {
-            try {
-                String dataAsString = new String(data); // pdf json csv txt
-                String filenameMarker = "filename=\"";
-                int filenameStart = dataAsString.indexOf(filenameMarker);
-                if (filenameStart == -1) {
-                    return null; // no filename found;
-                }
+//        public ParseResult parse() {
+//            try {
+//                String dataAsString = new String(data); // pdf json csv txt
+//                String filenameMarker = "filename=\"";
+//                int filenameStart = dataAsString.indexOf(filenameMarker);
+//                if (filenameStart == -1) {
+//                    return null; // no filename found;
+//                }
+//
+//                int filenameEnd = dataAsString.indexOf("\"", filenameStart);
+//                if (filenameEnd == -1) return null;
+//                String filename = dataAsString.substring(filenameStart, filenameEnd);
+//
+//                String lower = dataAsString.toLowerCase();
+//                String contentTypeMarker = "content-type: ";
+//                int contentTypeStart = lower.indexOf(contentTypeMarker, filenameEnd);
+//                String contentType = "application/octet-stream";
+//
+//                if (contentTypeStart != -1) {
+//                    contentTypeStart += contentTypeMarker.length();
+//                    int contentTypeEnd = dataAsString.indexOf("\r\n", contentTypeStart);
+//                    contentType = dataAsString.substring(contentTypeStart, contentTypeEnd);
+//                }
+//
+//                //data retrieval
+//                String headerEndMarker = "\r\n\r\n";
+//                int headerEnd = dataAsString.indexOf(headerEndMarker);
+//                if (headerEnd == -1) { // no empty space found after content type
+//                    return null;
+//                }
+//                int contentStart = headerEnd + headerEndMarker.length();
+//
+//                byte[] boundaryBytes = ("\r\n--" + boundary + "--").getBytes();
+//                int contentEnd = findSequence(data, boundaryBytes, contentStart); // found the end point of data in file
+//                if (contentEnd == -1) {
+//                    boundaryBytes = ("\r\n--" + boundary).getBytes();
+//                    contentEnd = findSequence(data, boundaryBytes, contentStart); // end format changed .. without "--"
+//                }
+//                if (contentEnd == -1 || contentEnd <= contentStart) {
+//                    return null;
+//                }
+//
+//                // finally getting raw data from file after file name content start and content End are successfully found out
+//                byte[] fileContent = new byte[contentEnd - contentStart];
+//                System.arraycopy(data, contentStart, fileContent, 0, fileContent.length);
+//                return new ParseResult(filename, fileContent, contentType);
+//
+//            } catch (Exception e) {
+//                System.out.println("Error fetching multiPartData : " + e.getMessage());
+//                return null;
+//            }
+//        }
+//
+public ParseResult parse() {
+    try {
+        // We only use String to search for headers (which are always text)
+        // but we keep the file content as raw bytes.
+        String dataHeaderPart = new String(data, 0, Math.min(data.length, 2048));
 
-                int filenameEnd = dataAsString.indexOf("\"", filenameStart);
-                if (filenameEnd == -1) return null;
-                String filename = dataAsString.substring(filenameStart, filenameEnd);
+        String filenameMarker = "filename=\"";
+        int filenameStart = dataHeaderPart.indexOf(filenameMarker);
+        if (filenameStart == -1) return null;
+        filenameStart += filenameMarker.length();
 
-                String lower = dataAsString.toLowerCase();
-                String contentTypeMarker = "content-type: ";
-                int contentTypeStart = lower.indexOf(contentTypeMarker, filenameEnd);
-                String contentType = "application/octet-stream";
+        int filenameEnd = dataHeaderPart.indexOf("\"", filenameStart);
+        if (filenameEnd == -1) return null;
+        String filename = dataHeaderPart.substring(filenameStart, filenameEnd);
 
-                if (contentTypeStart != -1) {
-                    contentTypeStart += contentTypeMarker.length();
-                    int contentTypeEnd = dataAsString.indexOf("\r\n", contentTypeStart);
-                    contentType = dataAsString.substring(contentTypeStart, contentTypeEnd);
-                }
+        // Find where the real data starts (after \r\n\r\n)
+        byte[] headerEndMarker = "\r\n\r\n".getBytes();
+        int contentStart = findSequence(data, headerEndMarker, 0) + headerEndMarker.length;
 
-                //data retrieval
-                String headerEndMarker = "\r\n\r\n";
-                int headerEnd = dataAsString.indexOf(headerEndMarker);
-                if (headerEnd == -1) { // no empty space found after content type
-                    return null;
-                }
-                int contentStart = headerEnd + headerEndMarker.length();
+        // Find where the data ends (the boundary)
+        byte[] boundaryBytes = ("\r\n--" + boundary).getBytes();
+        int contentEnd = findSequence(data, boundaryBytes, contentStart);
 
-                byte[] boundaryBytes = ("\r\n--" + boundary + "--").getBytes();
-                int contentEnd = findSequence(data, boundaryBytes, contentStart); // found the end point of data in file
-                if (contentEnd == -1) {
-                    boundaryBytes = ("\r\n--" + boundary).getBytes();
-                    contentEnd = findSequence(data, boundaryBytes, contentStart); // end format changed .. without "--"
-                }
-                if (contentEnd == -1 || contentEnd <= contentStart) {
-                    return null;
-                }
+        if (contentEnd == -1 || contentEnd <= contentStart) return null;
 
-                // finally getting raw data from file after file name content start and content End are successfully found out
-                byte[] fileContent = new byte[contentEnd - contentStart];
-                System.arraycopy(data, contentStart, fileContent, 0, fileContent.length);
-                return new ParseResult(filename, fileContent, contentType);
+        // Extract bytes directly from the array
+        byte[] fileContent = new byte[contentEnd - contentStart];
+        System.arraycopy(data, contentStart, fileContent, 0, fileContent.length);
 
-            } catch (Exception e) {
-                System.out.println("Error fetching multiPartData : " + e.getMessage());
-                return null;
-            }
-        }
+        return new ParseResult(filename, fileContent, "application/octet-stream");
 
+    } catch (Exception e) {
+        System.err.println("Parsing error: " + e.getMessage());
+        return null;
+    }
+}
 
         public static class ParseResult {
             private final String fileName;
