@@ -81,7 +81,7 @@ public class FileController {
 //            headers.add("Access-Control-Allow-Methods" , "POST"); //Only post Allowed
 //            headers.add("Access-Control-Allow-Headers" , "Content-Type,Authorization");
 
-            if( httpExchange.getRequestMethod().equalsIgnoreCase("POST")) {
+            if( !httpExchange.getRequestMethod().equalsIgnoreCase("POST")) {
                 String response = "METHOD NOT ALLOWED";
                 httpExchange.sendResponseHeaders(405,response.getBytes().length);
                 try(OutputStream outputStream = httpExchange.getResponseBody()) { // auto close
