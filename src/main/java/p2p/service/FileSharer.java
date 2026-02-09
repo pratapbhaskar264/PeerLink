@@ -63,7 +63,7 @@ private static class FileSenderHandler implements Runnable{
         try(FileInputStream fis = new FileInputStream(filePath)){ // we took input stream here from file and
             OutputStream outputStream = clientSocket.getOutputStream(); // creation of output stream for sockets
             String filename = new File(filePath).getName();
-            String header = "Filename "+filename+"\n"; // will be passed with output stream
+            String header = "Filename: "+filename+"\n"; // will be passed with output stream
             outputStream.write(header.getBytes());
 
             byte[] buffer = new byte[4096];
