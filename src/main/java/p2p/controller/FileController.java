@@ -24,15 +24,13 @@ public class FileController {
     public FileController( int port) throws IOException {
         this.fileSharer = new FileSharer();
         this.httpServer = HttpServer.create(new InetSocketAddress(port) , 0);
-
         this.uploadDir = System.getProperty("java.io.tempdir") + File.separator + "peerlink-uploads";
         this.excecutorService = Executors.newFixedThreadPool(10); //10 threads allowed
 
         File uploadDirFile = new File(uploadDir);
         if(!uploadDirFile.exists()) {
-            uploadDirFile.mkdir();
+            uploadDirFile.mkdirs();
         }
-
         httpServer.createContext("/upload" , new UploadHandler());
         httpServer.createContext("/download" , new DownloadHandler());
         httpServer.createContext("/" , new CORSHandler());
@@ -50,7 +48,7 @@ public class FileController {
     }
 
     //CORS handler
-    public class CORSHandler implements HttpHandler {
+    private class CORSHandler implements HttpHandler {
 
         @Override
         public void handle(HttpExchange httpExchange) throws IOException {
@@ -62,10 +60,9 @@ public class FileController {
             if( httpExchange.getRequestMethod().equalsIgnoreCase("OPTIONS")) {
                 httpExchange.sendResponseHeaders(204,-1);
             }
-            String response = "NOT FOUND";
-;
-            httpExchange.sendResponseHeaders(404,response.getBytes().length);
 
+            String response = "NOT FOUND";
+            httpExchange.sendResponseHeaders(404,response.getBytes().length);
             try(OutputStream outputStream = httpExchange.getResponseBody()) { // auto close
                 outputStream.write(response.getBytes());
             }
@@ -102,6 +99,7 @@ public class FileController {
                 try(OutputStream outputStream = httpExchange.getResponseBody()) {
                     outputStream.write(response.getBytes());
                 }
+                return; // do not proceed ahead
             }
 
             // proceed if the method is post and content-Type is valid
@@ -152,12 +150,12 @@ public class FileController {
                     try(OutputStream outputStream = httpExchange.getResponseBody()) {
                         outputStream.write(response.getBytes());
                     }
-                    return;
             }
         }
     }
-    private class DownloadHandler implements HttpHandler {
 
+    //downloadHandler
+    private class DownloadHandler implements HttpHandler {
         @Override
         public void handle(HttpExchange httpExchange) throws IOException {
             Headers headers = httpExchange.getResponseHeaders();
@@ -216,6 +214,7 @@ public class FileController {
                         }
                     }
                     tempFile.delete();
+
                 } catch (Exception e) {
                     System.out.println("Not able to download file" + e.getMessage());
                     String response = "Error downloading file" + e.getMessage();
@@ -225,13 +224,14 @@ public class FileController {
                         outputStream.write(response.getBytes());
                     }
                 }
-            }catch (Exception e ) {
-                e.printStackTrace();
+            } catch (NumberFormatException e) {
+                String response = "Bad Request: Invalid port number";
+                httpExchange.sendResponseHeaders(400, response.getBytes().length);
+                try (OutputStream os = httpExchange.getResponseBody()) {
+                    os.write(response.getBytes());
+                }
             }
-
         }
-
-
     }
     private static class Multiparser {
 
