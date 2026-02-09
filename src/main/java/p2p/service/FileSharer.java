@@ -1,17 +1,12 @@
 package p2p.service;
 
-import org.springframework.stereotype.Service;
 import p2p.utility.UploadUtils;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.OutputStream;
+import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.HashMap;
 
-@Service
 public class FileSharer {
     private HashMap<Integer , String> availableFiles;
 

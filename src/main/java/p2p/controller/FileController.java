@@ -2,9 +2,9 @@ package p2p.controller;
 
 import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpExchange;
+import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
-import org.apache.tomcat.util.http.fileupload.IOUtils;
-import org.springframework.http.server.reactive.HttpHandler;
+import org.apache.commons.io.IOUtils;
 import p2p.service.FileSharer;
 
 import java.io.*;
@@ -106,14 +106,22 @@ public class FileController {
 
             try {
 
-                String boundary = contentType.substring(contentType.indexOf("boundary=")+9);
+                String boundary = contentType.substring(contentType.indexOf("boundary=") + 9);
+                boundary = boundary.replace("\"", "");
+                boundary = boundary.trim();
                 ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
 
-                IOUtils.copy(httpExchange.getRequestBody() , byteArrayOutputStream);
-                byte[] requestdata = byteArrayOutputStream.toByteArray();
+                IOUtils.copy(httpExchange.getRequestBody(), byteArrayOutputStream);
+                byte[] requestData = byteArrayOutputStream.toByteArray();
+                System.out.println("✅ Upload /upload called");
+                System.out.println("Content-Type: " + contentType);
+                System.out.println("Boundary: " + boundary);
+                System.out.println("Request size (bytes): " + requestData.length);
+                Multiparser parser = new Multiparser(requestData, boundary);
+                Multiparser.ParseResult result = parser.parse();
 
-                Multiparser multiParser = new Multiparser(requestdata , boundary);
-                Multiparser.ParseResult result = multiParser.parse();
+//                Multiparser multiParser = new Multiparser(requestData , boundary);
+//                Multiparser.ParseResult result = multiParser.parse();
                 if(result == null) {
                     String response = "Bad request : Could not parse File Content ";
                     httpExchange.sendResponseHeaders(400,response.getBytes().length);
@@ -254,11 +262,14 @@ public class FileController {
                 }
 
                 int filenameEnd = dataAsString.indexOf("\"", filenameStart);
+                if (filenameEnd == -1) return null;
                 String filename = dataAsString.substring(filenameStart, filenameEnd);
 
-                String contentTypeMarker = "Content-Type: ";
-                int contentTypeStart = dataAsString.indexOf(contentTypeMarker, filenameEnd);
+                String lower = dataAsString.toLowerCase();
+                String contentTypeMarker = "content-type: ";
+                int contentTypeStart = lower.indexOf(contentTypeMarker, filenameEnd);
                 String contentType = "application/octet-stream";
+
                 if (contentTypeStart != -1) {
                     contentTypeStart += contentTypeMarker.length();
                     int contentTypeEnd = dataAsString.indexOf("\r\n", contentTypeStart);
