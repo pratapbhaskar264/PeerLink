@@ -225,7 +225,10 @@ public class FileController {
                         outputStream.write(response.getBytes());
                     }
                 }
+            }catch (Exception e ) {
+                e.printStackTrace();
             }
+
         }
 
 
