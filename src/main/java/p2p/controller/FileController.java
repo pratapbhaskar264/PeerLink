@@ -210,7 +210,8 @@ public class FileController {
                             fileOutputStream.write(buffer, 0, byteRead);
                         }
                     }
-                    headers.add("Content-Disposition: ", "attachment; filename=\"" + fileName + "\"");
+                    //headers.add("Content-Disposition", "attachment; filename=\"" + fileName + "\"");
+                    headers.add("Content-Disposition", "attachment; filename=\"" + fileName + "\"");
                     headers.add("Content-Type", "application/octet-stream");
                     httpExchange.sendResponseHeaders(200, tempFile.length());
                     // sending this temp file to the client
