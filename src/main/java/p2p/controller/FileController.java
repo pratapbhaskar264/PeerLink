@@ -298,12 +298,12 @@ public class FileController {
         public static class ParseResult {
             private final String fileName;
             private final byte[] fileContent;
-            private final String content;
+            private final String contentType;
 
-            public ParseResult(String fileName, byte[] fileContent, String content) {
+            public ParseResult(String fileName, byte[] fileContent, String contentType) {
                 this.fileName = fileName;
                 this.fileContent = fileContent;
-                this.content = content;
+                this.contentType = contentType;
             }
         }
 
