@@ -7,29 +7,37 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.HashMap;
 
+//package p2p.service;
+
+import p2p.utility.UploadUtils;
+
+import java.util.HashMap;
+import java.util.Map;
+
 public class FileSharer {
-    private HashMap<Integer , String> availableFiles;
+    private final Map<Integer, String> availableFiles = new HashMap<>();
 
-    public FileSharer(){
-        availableFiles = new HashMap<>(); // this will store files available at certain port as of now
+    public int offerFile(String filePath) {
+        int code;
+        do {
+            code = UploadUtils.genrateCode();
+        } while (availableFiles.containsKey(code));
+        availableFiles.put(code, filePath);
+        return code;
     }
 
-    // uploading end
-    public int offerFile(String filePath) { // it is taking file path and returning port ->
-        // -> after its loaded with file in available file map
-        int port;
-        while(true) {
-           port = UploadUtils.genrateCode();
-           if(!availableFiles.containsKey(port)) {
-               availableFiles.put(port,filePath); // so basically map holds the file that appear to be at a port
-               return port;
-           }
-        }
+    public String getFilePath(int code) {
+        return availableFiles.get(code); // returns null if not found
     }
+
+    public void removeFile(int code) {
+        availableFiles.remove(code);
+    }
+//}
     // download end point will handle all the cumputations of header and all and then it will go to filesharer
     //downloading end
-    // client -> upload 
-    // client2 -> download -> server -> downloadEndPt. -> filesharer -> socket -> outcome  
+    // client -> upload
+    // client2 -> download -> server -> downloadEndPt. -> filesharer -> socket -> outcome
     public void startFileServer(int port) { //it seems that download handler will communicate to download...but filesharer is handling it all
         if(!availableFiles.containsKey(port)) {
             System.out.println("No file associated with port " +port);
