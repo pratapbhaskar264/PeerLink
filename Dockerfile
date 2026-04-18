@@ -6,15 +6,16 @@ RUN mvn dependency:go-offline
 COPY src ./src
 RUN mvn package -DskipTests
 
-# Debug — print what jars were created (check render logs)
-RUN ls -la target/
+# Manually extract all jars and repackage with correct manifest
+RUN mkdir -p /app/fatjar && \
+    cd /app/fatjar && \
+    find /app/target -name "*.jar" -not -name "original-*" | head -1 | xargs -I{} jar xf {} && \
+    echo "Main-Class: p2p.App" > manifest.txt && \
+    jar cfm /app/app.jar manifest.txt -C /app/fatjar .
 
 # Run stage
 FROM eclipse-temurin:17-jre-alpine
 WORKDIR /app
-
-# Copy only the shaded jar, NOT the original-* one
-COPY --from=build /app/target/peerlink-1.0-SNAPSHOT.jar app.jar
-
+COPY --from=build /app/app.jar app.jar
 EXPOSE 8080
 ENTRYPOINT ["java", "-jar", "app.jar"]
