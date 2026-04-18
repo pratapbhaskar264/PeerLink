@@ -25,6 +25,8 @@ ui/.env.development.local
 ui/.env.test.local
 ui/.env.production.local
 
+#files
+/null/
 # Logs
 logs
 *.log
