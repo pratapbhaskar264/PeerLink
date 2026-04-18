@@ -6,11 +6,11 @@ const nextConfig = {
     return [
       {
         source: '/api/upload',
-        destination: 'http://localhost:8080/upload',
+        destination: 'https://peerlink-hst3.onrender.com/upload',
       },
       {
         source: '/api/download/:port',
-        destination: 'http://localhost:8080/download/:port',
+        destination: 'https://peerlink-hst3.onrender.com/download/:port',
       },
     ];
   },
