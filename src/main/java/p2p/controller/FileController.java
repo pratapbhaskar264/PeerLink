@@ -405,6 +405,13 @@ public class FileController {
         this.httpServer = HttpServer.create(new InetSocketAddress(port), 0);
         httpServer.createContext("/upload", new UploadHandler());
         httpServer.createContext("/download", new DownloadHandler());
+        httpServer.createContext("/health", exchange -> {
+            String response = "OK";
+            exchange.sendResponseHeaders(200, response.getBytes().length);
+            try (OutputStream os = exchange.getResponseBody()) {
+                os.write(response.getBytes());
+            }
+        });
         httpServer.createContext("/", new CORSHandler());
         httpServer.setExecutor(executorService);
     }
