@@ -6,10 +6,12 @@ RUN mvn dependency:go-offline
 COPY src ./src
 RUN mvn package -DskipTests
 
-# Manually extract all jars and repackage with correct manifest
+# Manually repackage with all dependencies
 RUN mkdir -p /app/fatjar && \
     cd /app/fatjar && \
-    find /app/target -name "*.jar" -not -name "original-*" | head -1 | xargs -I{} jar xf {} && \
+    find /root/.m2 -name "commons-io-2.15.1.jar" | xargs -I{} jar xf {} && \
+    find /root/.m2 -name "commons-fileupload-1.5.jar" | xargs -I{} jar xf {} && \
+    jar xf /app/target/*.jar && \
     echo "Main-Class: p2p.App" > manifest.txt && \
     jar cfm /app/app.jar manifest.txt -C /app/fatjar .
 
