@@ -4,7 +4,7 @@ export const maxDuration = 60;
 
 export async function POST(request: NextRequest) {
   const formData = await request.formData();
-  const response = await fetch('https://peerlink-hst3.onrender.com/upload', {
+  const response = await fetch('https://peerlink-production-c096.up.railway.app/upload', {
     method: 'POST',
     body: formData,
   });
