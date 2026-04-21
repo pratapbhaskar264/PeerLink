@@ -2,7 +2,7 @@
 
 A lightweight, peer-to-peer file sharing web application. Upload a file, get an invite code, and share it with anyone to download directly.
 
-**Live Demo**: [splendorous-longma-b78c90.netlify.app](https://splendorous-longma-b78c90.netlify.app)
+**Live Demo**: [peer-linkk.netlify.app](https://peer-linkk.netlify.app/)
 
 ---
 
